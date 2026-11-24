@@ -148,6 +148,7 @@ ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 LLM_MODEL = os.environ.get("LLM_MODEL", "claude-sonnet-5-5")
 LLM_MAX_SEARCHES = int(os.environ.get("LLM_MAX_SEARCHES", "5"))
 LLM_TIMEOUT_SECONDS = int(os.environ.get("LLM_TIMEOUT_SECONDS", "90"))
+MOCK_DELAY_SECONDS = float(os.environ.get("MOCK_DELAY_SECONDS", "1.5"))  # fake latency for the mock provider
 
 CACHE_TTL_HOURS = int(os.environ.get("CACHE_TTL_HOURS", "24"))
 RATE_LIMIT_ANON_PER_DAY = int(os.environ.get("RATE_LIMIT_ANON_PER_DAY", "5"))

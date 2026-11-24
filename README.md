@@ -18,6 +18,10 @@ Copy-Item .env.example .env        # sonra .env içini doldur
 - Ana sayfa: http://127.0.0.1:8000/ — sağlık kontrolü: http://127.0.0.1:8000/api/health/
 - Hızlı test (SQLite, Supabase'e dokunmaz): `$env:DATABASE_URL=""; .venv\Scripts\python.exe manage.py test`
 
+## Arayüzü deneme (mock veri)
+
+`LLM_PROVIDER=mock` iken arama sahte "kablosuz kulaklık" verisi döndürür (1,5 sn yapay gecikme, `MOCK_DELAY_SECONDS`). Her sorgu aynı örnek ürünleri gösterir; mod, bütçe, puan ve sonuç sayısı filtreleri listeye uygulanır. Hata ekranını görmek için "Bana bir şiir yaz" ara (ürün değil → 422). Paylaşılabilir link örneği: `/?q=kablosuz+kulakl%C4%B1k&country=TR&mode=value`.
+
 ## Ortam değişkenleri
 
 `.env.example` dosyasına bak. `.env` asla git'e girmez. Önemli olanlar:

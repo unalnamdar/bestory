@@ -1,0 +1,59 @@
+/* Design tokens (CLAUDE.md section 9). The head script sets data-theme to light|dark. */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #F5F6F8;
+  --surface: #FFFFFF;
+  --surface-2: #EEF0F3;
+  --border: #E1E4E8;
+  --text: #1E242B;
+  --text-muted: #5A6570;
+  /* Spec had #EA580C; white text on it is only 3.56:1, so the button color is
+     one step darker to reach WCAG AA (5.18:1). */
+  --primary: #C2410C;
+  --primary-hover: #9A3412;
+  --primary-text: #C2410C;
+  --on-primary: #FFFFFF;
+  --primary-soft: #FFF1E7;
+  --star: #F5A524;
+  --success: #166534;
+  --success-soft: #E8F6EC;
+  --info-soft: #FEF6E0;
+  --danger: #B91C1C;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 4px 12px rgba(16, 24, 40, .06);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111418;
+  --surface: #1A1F25;
+  --surface-2: #232931;
+  --border: #2F3640;
+  --text: #E6E9ED;
+  --text-muted: #9AA4AF;
+  --primary: #FB8A3C;
+  --primary-hover: #FDA466;
+  --primary-text: #FDA466;
+  --on-primary: #1A1006;
+  --primary-soft: #3A2414;
+  --star: #FBBF24;
+  --success: #4ADE80;
+  --success-soft: #16301F;
+  --info-soft: #3A3010;
+  --danger: #F87171;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 12px rgba(0, 0, 0, .3);
+}
+
+:root {
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --max-width: 1100px;
+}

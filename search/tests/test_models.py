@@ -10,7 +10,7 @@ from search.models import SearchCache, SearchLog
 class SearchModelTests(TestCase):
     def test_cache_key_unique(self):
         kwargs = dict(
-            cache_key="a" * 64, query="ofis sandalyesi", country="TR", mode="value",
+            cache_key="a" * 64, query="kablosuz kulaklık", country="TR", mode="value",
             result={"products": []}, expires_at=timezone.now() + timedelta(hours=24),
         )
         SearchCache.objects.create(**kwargs)

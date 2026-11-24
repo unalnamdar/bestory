@@ -1,8 +1,80 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Bestory — yakında{% endblock %}
+{% block title %}Bestory — Ne almak istiyorsun?{% endblock %}
 
 {% block content %}
-  <h1>Bestory</h1>
-  <p>Yakında.</p>
+<section class="hero container">
+  <h1>Ne almak istiyorsun?</h1>
+  <p class="hero__sub">Bir ürün ya da kategori yaz; seçtiğin ülkedeki güncel verilere göre en çok satanları, en yüksek puanlıları ve fiyat/performans seçeneklerini listeleyelim.</p>
+
+  <form id="search-form" class="search-form" novalidate>
+    <div>
+      <label class="sr-only" for="q">Ürün veya kategori</label>
+      <div class="search-row">
+        <input class="input" id="q" name="q" type="search" maxlength="100" autocomplete="off"
+               placeholder="Ne almak istiyorsun? (ör. kablosuz kulaklık)" aria-describedby="q-error">
+        <button class="btn btn-primary" type="submit" id="submit-btn">Analiz et</button>
+      </div>
+      <p class="field-error" id="q-error" role="alert" hidden></p>
+    </div>
+
+    <fieldset class="chips" aria-label="Listeleme ölçütü">
+      <legend class="sr-only">Listeleme ölçütü</legend>
+      <label class="chip"><input type="radio" name="mode" value="best_sellers" checked><span class="chip__label">Çok satanlar</span></label>
+      <label class="chip"><input type="radio" name="mode" value="top_rated"><span class="chip__label">En yüksek puan</span></label>
+      <label class="chip"><input type="radio" name="mode" value="value"><span class="chip__label">Fiyat/performans</span></label>
+      <label class="chip"><input type="radio" name="mode" value="custom"><span class="chip__label">Özel</span></label>
+    </fieldset>
+
+    <details class="filters" id="filters">
+      <summary>Filtreler</summary>
+      <div class="filters__grid">
+        <div>
+          <label class="label" for="min-price">En düşük bütçe</label>
+          <input class="number" id="min-price" name="min_price" type="number" inputmode="decimal" min="0" step="any" placeholder="Opsiyonel" aria-describedby="price-error">
+        </div>
+        <div>
+          <label class="label" for="max-price">En yüksek bütçe</label>
+          <input class="number" id="max-price" name="max_price" type="number" inputmode="decimal" min="0" step="any" placeholder="Opsiyonel" aria-describedby="price-error">
+        </div>
+        <div>
+          <label class="label" for="min-rating">Minimum puan: <span class="range-value" id="min-rating-value">Fark etmez</span></label>
+          <input id="min-rating" name="min_rating" type="range" min="2.9" max="4.9" step="0.1" value="2.9" aria-describedby="min-rating-value">
+        </div>
+        <div>
+          <label class="label" for="limit">Sonuç sayısı</label>
+          <select class="select" id="limit" name="limit" style="width:100%">
+            <option value="10" selected>10 ürün</option>
+            <option value="5">5 ürün</option>
+          </select>
+        </div>
+      </div>
+      <p class="field-error" id="price-error" role="alert" hidden style="margin: 0 0 16px"></p>
+    </details>
+
+    <div>
+      <label class="label" for="custom">Ek isteklerin <small id="custom-hint">(opsiyonel)</small></label>
+      <textarea class="textarea" id="custom" name="custom_criteria" maxlength="300" rows="3"
+                placeholder="ör. kablosuz, aktif gürültü engelleme (ANC), 2000 TL altı" aria-describedby="custom-count custom-error"></textarea>
+      <div class="counter" id="custom-count" aria-live="off">0 / 300</div>
+      <p class="field-error" id="custom-error" role="alert" hidden></p>
+    </div>
+
+    <div class="examples" id="examples">
+      <span class="examples__title">Dene:</span>
+      <button type="button" class="chip-btn" data-example="kablosuz kulaklık">kablosuz kulaklık</button>
+      <button type="button" class="chip-btn" data-example="ofis sandalyesi">ofis sandalyesi</button>
+      <button type="button" class="chip-btn" data-example="robot süpürge">robot süpürge</button>
+    </div>
+  </form>
+</section>
+
+<section class="results container" id="results" aria-live="polite" aria-busy="false"></section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/api.js' %}"></script>
+<script src="{% static 'js/render.js' %}"></script>
+<script src="{% static 'js/search.js' %}"></script>
 {% endblock %}

@@ -114,7 +114,7 @@ bestory/
 │   │   ├── mock.py             # fixture döndürür
 │   │   └── anthropic_provider.py
 │   ├── fixtures/
-│   │   └── mock_office_chair_tr.json
+│   │   └── mock_wireless_headphones_tr.json
 │   └── tests/
 ├── templates/
 │   ├── base.html
@@ -478,7 +478,7 @@ Gizli değerler asla koda veya repoya yazılmaz. `.env` `.gitignore`'da olmalı.
 | Faz | Başlık | Durum |
 |---|---|---|
 | 0 | Kurulum, iskelet, Supabase + Vercel bağlantısı | ✅ (canlı: https://bestory.vercel.app) |
-| 1 | Arayüz, tasarım sistemi, dark mode (mock verilerle) | ⬜ |
+| 1 | Arayüz, tasarım sistemi, dark mode (mock verilerle) | ✅ Kod hazır; kullanıcı gözle doğrulayacak |
 | 2 | Gerçek analiz motoru (LLM + web search, cache, rate limit) | ⬜ |
 | 3 | Üyelik sistemi (kayıt, giriş, çıkış, profil) | ⬜ |
 | 4 | Cilalama ve production yayını | ⬜ |
@@ -526,7 +526,7 @@ tablosunu güncelle ve dur; Faz 1'e geçme.
 - `tokens.css`, `base.css`, `components.css` (bölüm 9).
 - Dark mode: inline tema script'i, toggle, `system` desteği, `localStorage`.
 - Header, footer, ülke seçici (bölüm 6.4 listesi), hero arama alanı, mod chip'leri, filtre paneli, custom textarea + karakter sayacı, örnek chip'ler.
-- `MockProvider` + `fixtures/mock_office_chair_tr.json` (10 gerçekçi ama açıkça örnek ürün; URL'ler örnek alan adı olabilir).
+- `MockProvider` + `fixtures/mock_wireless_headphones_tr.json` (10 gerçekçi ama açıkça örnek ürün; URL'ler örnek alan adı olabilir).
 - `/api/search/` endpoint'inin ilk hali: doğrulama + mock provider (cache/rate limit henüz yok).
 - `search.js`: form → fetch → skeleton + aşama mesajları → kart render (`textContent` ile güvenli), istemci tarafı sıralama, hata/boş durumları, URL query parametrelerini `history.replaceState` ile güncelleme ve sayfa açılışında otomatik arama.
 - Responsive grid ve erişilebilirlik (bölüm 9.6).
@@ -661,6 +661,12 @@ yaz. Faz tablosunu güncelle ve dur.
 - Lokal `.env` Supabase **Session pooler (5432)**; Vercel **Transaction pooler (6543)**. İkisi için de `prepare_threshold=None` ve `DISABLE_SERVER_SIDE_CURSORS` ayarlı.
 - RLS: `core/migrations/0001_enable_rls.py` mevcut tüm `public` tablolarında RLS açar; yeni tablolar için elle tekrar gerekir (README).
 - Vercel (docs 2026-11-14): `manage.py` algılanır, giriş `WSGI_APPLICATION`; `STATIC_ROOT` varsa `collectstatic` otomatik. `maxDuration` `vercel.json` içinde `"functions": {"bestory/wsgi.py": {"maxDuration": N}}` ile verilir (Hobby üst sınır 300 sn). Faz 2'de `LLM_TIMEOUT_SECONDS + 15` olarak eklenecek.
+- **Kontrast (Faz 1):** açık temada beyaz metin `#EA580C` üzerinde 3,56:1 çıktığı için `--primary` `#C2410C`, `--primary-hover` `#9A3412` yapıldı; `--success` `#166534`, `--danger` `#B91C1C` (açık tema) olarak koyulaştırıldı. Koyu tema aynı. Tüm metin/zemin çiftleri ≥ 4,5:1.
+- **Örnek ürün (Faz 1 kararı):** mock verisi ve örnek chip'ler "kablosuz kulaklık" üzerine (kapasite/ANC/fiyat gibi değişken özellikler); fixture adı `mock_wireless_headphones_tr.json`. Özel istek placeholder'ı: "kablosuz, aktif gürültü engelleme (ANC), 2000 TL altı". Faz 2 kabul kriterindeki "ofis sandalyesi" örneği geçerliliğini korur (herhangi bir ürün olabilir).
+- **Kart tıklama:** ürün kartının tamamı ilk `https://` kaynağına gider (başlık bağlantısı kart üzerine gerilir, yeni sekmede açılır); artı/eksi `<details>` ve kaynak bağlantıları kendi başlarına tıklanabilir kalır.
+- **Ölçüler:** kullanıcı geri bildirimiyle arayüz sıkılaştırıldı: taban font 15px, düğme/input ~40-42px, kart dolgusu 16px, `--max-width` 1100px (spec'te 1200px'ti).
+- **Mock sağlayıcı:** `MOCK_DELAY_SECONDS` (varsayılan 1,5) yapay gecikme; sorguda "şiir/poem/hikaye/fıkra" geçerse `not_a_product` (422) döner. Mod ve filtreler fixture üzerinde `shape_for_request` ile uygulanır (yalnızca mock). Fixture ürünleri yapay örneklerdir.
+- Faz 1'de header'da giriş/kayıt bağlantıları yok (Faz 3'te eklenecek). `schema.py`, `prompts.py`, `countries.py`, `analyzer.py` iskeleti Faz 1'de açıldı; cache, rate limit, SearchLog ve JSON düzeltme denemesi Faz 2'de.
 - Ham `.env` hiçbir yerde commit'lenmez; `check_setup.py` yardımcı kontrol betiğidir.
 
 ---

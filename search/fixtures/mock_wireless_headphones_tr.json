@@ -1,0 +1,121 @@
+{
+  "query": "kablosuz kulaklık",
+  "country": "TR",
+  "currency": "TRY",
+  "mode": "best_sellers",
+  "generated_at": "2026-11-24T19:00:00Z",
+  "summary": "ÖRNEK VERİ: Bu liste, arayüzü denemek için hazırlanmış yapay örneklerdir; gerçek ürün, fiyat veya puan değildir. 2.000 TL altında aktif gürültü engelleme (ANC) sunan modeller öne çıkıyor; premium kulak üstü modeller ses kalitesinde önde ama çok daha pahalı.",
+  "products": [
+    {
+      "rank": 1, "name": "Bassa Buds Lite Kablosuz Kulak İçi Kulaklık", "brand": "Bassa",
+      "price_min": 549, "price_max": 749, "rating": 4.1, "rating_count": 8420, "rating_source": "Trendyol",
+      "popularity_note": "Kulaklık kategorisinde en çok satanlar arasında", "value_score": 8.3,
+      "badges": ["best_seller", "value"],
+      "highlights": ["Bluetooth 5.3", "Şarj kutusuyla 24 saat pil", "Dokunmatik kontrol"],
+      "pros": ["Çok uygun fiyat", "Hafif ve küçük"],
+      "cons": ["Aktif gürültü engelleme yok", "Mikrofon kalabalıkta zayıf"],
+      "why_ranked": "Satış sinyalleri çok güçlü; giriş seviyesinde en çok tercih edilen kablosuz kulaklık.",
+      "sources": [{"title": "Trendyol ürün sayfası (örnek)", "url": "https://example.com/trendyol/bassa-buds-lite"}]
+    },
+    {
+      "rank": 2, "name": "Sonora Air ANC Kablosuz Kulaklık", "brand": "Sonora",
+      "price_min": 1399, "price_max": 1799, "rating": 4.4, "rating_count": 5310, "rating_source": "Hepsiburada",
+      "popularity_note": "Son 30 günde en çok satanlar arasında", "value_score": 9.0,
+      "badges": ["best_seller", "value"],
+      "highlights": ["Hibrit aktif gürültü engelleme (ANC)", "30 saate kadar pil", "Şeffaf mod"],
+      "pros": ["Fiyatına göre güçlü ANC", "Rahat kulak uçları", "Hızlı şarj"],
+      "cons": ["Bas tonu abartılı bulunabilir"],
+      "why_ranked": "ANC özelliğini 2.000 TL altında sunması ve yüksek satış hacmi onu listenin başına taşıyor.",
+      "sources": [{"title": "Hepsiburada ürün sayfası (örnek)", "url": "https://example.com/hepsiburada/sonora-air-anc"}]
+    },
+    {
+      "rank": 3, "name": "Ritmo Wave Neo Kulak Üstü Kulaklık", "brand": "Ritmo",
+      "price_min": 899, "price_max": 1199, "rating": 4.3, "rating_count": 3120, "rating_source": "Trendyol",
+      "popularity_note": "Kulak üstü kulaklıklarda çok satan", "value_score": 8.8,
+      "badges": ["value"],
+      "highlights": ["Kulak üstü, katlanabilir", "40 saat pil", "3,5 mm kablolu kullanım"],
+      "pros": ["Uzun pil ömrü", "Konforlu yastıklar"],
+      "cons": ["Aktif gürültü engelleme yok", "Plastik gövde"],
+      "why_ranked": "Uzun pil ömrü ve kulak üstü konforu bütçe dostu fiyatla birleşiyor.",
+      "sources": [{"title": "Trendyol ürün sayfası (örnek)", "url": "https://example.com/trendyol/ritmo-wave-neo"}]
+    },
+    {
+      "rank": 4, "name": "Vokal Studio ANC 700 Kulak Üstü Kulaklık", "brand": "Vokal",
+      "price_min": 3490, "price_max": 4290, "rating": 4.6, "rating_count": 980, "rating_source": "Amazon.com.tr",
+      "popularity_note": "Premium kulaklık kategorisinde ilk 10'da", "value_score": 7.9,
+      "badges": ["top_rated"],
+      "highlights": ["Aktif gürültü engelleme (ANC)", "50 saate kadar pil", "Çoklu cihaz bağlantısı"],
+      "pros": ["Dengeli ve detaylı ses", "Çok iyi ANC", "Sağlam yapı"],
+      "cons": ["Fiyatı yüksek", "Katlanınca hâlâ hacimli"],
+      "why_ranked": "Puanı yüksek ve ses kalitesi öne çıkıyor; bütçesi geniş olanlar için güçlü seçenek.",
+      "sources": [{"title": "Amazon.com.tr ürün sayfası (örnek)", "url": "https://example.com/amazon-tr/vokal-studio-anc-700"}]
+    },
+    {
+      "rank": 5, "name": "Pulsar Sport Clip Kulak Kancalı Spor Kulaklık", "brand": "Pulsar",
+      "price_min": 1099, "price_max": 1399, "rating": 4.0, "rating_count": 2210, "rating_source": "n11",
+      "popularity_note": null, "value_score": 7.4,
+      "badges": ["best_seller"],
+      "highlights": ["IPX5 su ve ter direnci", "Kulak kancalı güvenli takım", "Bluetooth 5.2"],
+      "pros": ["Koşuda yerinden çıkmıyor", "Ter geçirmez"],
+      "cons": ["Aktif gürültü engelleme yok", "Bas zayıf"],
+      "why_ranked": "Spor kullanımına yönelik en çok satanlardan; günlük müzik dinleme için ortalama.",
+      "sources": [{"title": "n11 ürün sayfası (örnek)", "url": "https://example.com/n11/pulsar-sport-clip"}]
+    },
+    {
+      "rank": 6, "name": "Aurora Max ANC Premium Kulak Üstü Kulaklık", "brand": "Aurora",
+      "price_min": 6490, "price_max": 7990, "rating": 4.8, "rating_count": 410, "rating_source": "Amazon.com.tr",
+      "popularity_note": null, "value_score": 6.5,
+      "badges": ["top_rated"],
+      "highlights": ["Gelişmiş aktif gürültü engelleme (ANC)", "Yüksek çözünürlüklü ses desteği", "Deri kulak yastıkları"],
+      "pros": ["Sınıfının en iyi sesi", "Çok başarılı ANC", "Uzun ömürlü malzeme"],
+      "cons": ["Çok pahalı", "Ağır hissedilebilir"],
+      "why_ranked": "Puanı en yüksek ürünlerden biri; fiyatı nedeniyle fiyat/performans sıralamasında geride.",
+      "sources": [{"title": "Amazon.com.tr ürün sayfası (örnek)", "url": "https://example.com/amazon-tr/aurora-max-anc"}]
+    },
+    {
+      "rank": 7, "name": "Kora Buds ANC 2 Kablosuz Kulaklık", "brand": "Kora",
+      "price_min": 1899, "price_max": 2399, "rating": 4.5, "rating_count": 1350, "rating_source": "Hepsiburada",
+      "popularity_note": "ANC'li kulak içi kulaklıklarda öne çıkan", "value_score": 8.6,
+      "badges": ["top_rated", "value"],
+      "highlights": ["Aktif gürültü engelleme (ANC)", "Şeffaf mod", "Kablosuz şarj desteği"],
+      "pros": ["Yüksek puan ve çok yorum", "Kablosuz şarj", "Net mikrofon"],
+      "cons": ["Fiyat 2.000 TL civarında", "Kulak uçları büyük kulaklarda sıkabilir"],
+      "why_ranked": "Puan, ANC ve yorum sayısı birlikte güçlü; fiyat/performansta Sonora'nın hemen arkasında.",
+      "sources": [{"title": "Hepsiburada ürün sayfası (örnek)", "url": "https://example.com/hepsiburada/kora-buds-anc-2"}]
+    },
+    {
+      "rank": 8, "name": "Tempo Neckband Plus Boyun Bantlı Kulaklık", "brand": "Tempo",
+      "price_min": 449, "price_max": 649, "rating": 3.9, "rating_count": 6870, "rating_source": "Trendyol",
+      "popularity_note": "Yüksek satış hacmi", "value_score": 7.0,
+      "badges": ["best_seller"],
+      "highlights": ["Boyun bantlı tasarım", "35 saate kadar pil", "Mıknatıslı uçlar"],
+      "pros": ["Çok ucuz", "Pili çok dayanıyor"],
+      "cons": ["Ses kalitesi sıradan", "Bant rahatsız edebilir"],
+      "why_ranked": "Satış hacmi yüksek ama puanı orta düzeyde; en düşük bütçeli seçeneklerden.",
+      "sources": [{"title": "Trendyol ürün sayfası (örnek)", "url": "https://example.com/trendyol/tempo-neckband-plus"}]
+    },
+    {
+      "rank": 9, "name": "Nimbus Kids Safe Çocuk Kulaklığı", "brand": "Nimbus",
+      "price_min": 599, "price_max": 799, "rating": 4.2, "rating_count": 640, "rating_source": "Hepsiburada",
+      "popularity_note": null, "value_score": 7.6,
+      "badges": ["value"],
+      "highlights": ["Ses seviyesi sınırlama (85 dB)", "Ayarlanabilir kafa bandı", "Bluetooth ve kablolu kullanım"],
+      "pros": ["Çocuk kulağı için güvenli ses", "Dayanıklı gövde"],
+      "cons": ["Aktif gürültü engelleme yok", "Yetişkinler için küçük"],
+      "why_ranked": "Çocuklar için özel ürün; genel kullanıma uygun olmadığı için orta sırada.",
+      "sources": [{"title": "Hepsiburada ürün sayfası (örnek)", "url": "https://example.com/hepsiburada/nimbus-kids-safe"}]
+    },
+    {
+      "rank": 10, "name": "Lumen Gaming Wireless Oyuncu Kulaklığı", "brand": "Lumen",
+      "price_min": 1299, "price_max": 1799, "rating": 4.2, "rating_count": 1780, "rating_source": "n11",
+      "popularity_note": null, "value_score": 7.2,
+      "badges": ["value"],
+      "highlights": ["Düşük gecikmeli 2,4 GHz alıcı", "Çıkarılabilir mikrofon", "RGB aydınlatma"],
+      "pros": ["Oyunlarda düşük gecikme", "Geniş ses sahnesi"],
+      "cons": ["Aktif gürültü engelleme yok", "Gündelik kullanımda iri"],
+      "why_ranked": "Oyun için iyi bir seçenek; müzik ve günlük kullanımda daha uygun alternatifler var.",
+      "sources": [{"title": "n11 ürün sayfası (örnek)", "url": "https://example.com/n11/lumen-gaming-wireless"}]
+    }
+  ],
+  "data_note": "Örnek veridir (mock). Gerçek analizde veriler web'den yapay zekâ ile derlenir; fiyat ve stoklar değişebilir."
+}

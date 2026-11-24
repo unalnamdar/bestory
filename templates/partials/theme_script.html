@@ -1,0 +1,15 @@
+<script>
+  /* Runs before CSS to avoid a flash of the wrong theme. Keep in sync with static/js/theme.js */
+  (function () {
+    try {
+      var pref = localStorage.getItem('bestory-theme') || 'system';
+      var dark = pref === 'dark' || (pref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      var root = document.documentElement;
+      root.setAttribute('data-theme', dark ? 'dark' : 'light');
+      root.setAttribute('data-theme-pref', pref);
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.documentElement.setAttribute('data-theme-pref', 'system');
+    }
+  })();
+</script>
