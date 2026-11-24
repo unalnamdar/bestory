@@ -477,7 +477,7 @@ Gizli değerler asla koda veya repoya yazılmaz. `.env` `.gitignore`'da olmalı.
 
 | Faz | Başlık | Durum |
 |---|---|---|
-| 0 | Kurulum, iskelet, Supabase + Vercel bağlantısı | 🟨 Kod + Supabase hazır; Vercel deploy kullanıcıda |
+| 0 | Kurulum, iskelet, Supabase + Vercel bağlantısı | ✅ (canlı: https://bestory.vercel.app) |
 | 1 | Arayüz, tasarım sistemi, dark mode (mock verilerle) | ⬜ |
 | 2 | Gerçek analiz motoru (LLM + web search, cache, rate limit) | ⬜ |
 | 3 | Üyelik sistemi (kayıt, giriş, çıkış, profil) | ⬜ |
