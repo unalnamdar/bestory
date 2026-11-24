@@ -76,6 +76,7 @@ for mod, pkg in [
     ("dotenv", "python-dotenv"),
     ("pydantic", "pydantic"),
     ("anthropic", "anthropic"),
+    ("google.genai", "google-genai"),
 ]:
     if importlib.util.find_spec(mod):
         ok(f"package {pkg}")
@@ -94,6 +95,10 @@ else:
     provider = env.get("LLM_PROVIDER", "mock")
     if provider == "anthropic" and not env.get("ANTHROPIC_API_KEY"):
         fail("LLM_PROVIDER=anthropic but ANTHROPIC_API_KEY is empty")
+    elif provider == "gemini" and not env.get("GEMINI_API_KEY"):
+        fail("LLM_PROVIDER=gemini but GEMINI_API_KEY is empty")
+    elif provider == "tavily_gemini" and not (env.get("GEMINI_API_KEY") and env.get("TAVILY_API_KEY")):
+        fail("LLM_PROVIDER=tavily_gemini needs both GEMINI_API_KEY and TAVILY_API_KEY")
     else:
         ok(f"LLM_PROVIDER={provider}")
 

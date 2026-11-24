@@ -11,12 +11,13 @@
     return '';
   }
 
-  function ApiError(status, code, message, fields) {
+  function ApiError(status, code, message, fields, detail) {
     this.name = 'ApiError';
     this.status = status;
     this.code = code;
     this.message = message;
     this.fields = fields || {};
+    this.detail = detail || {};
   }
   ApiError.prototype = Object.create(Error.prototype);
 
@@ -36,9 +37,12 @@
         var err = (body && body.error) || {};
         throw new ApiError(
           res.status,
-          err.code || 'unknown',
-          err.message || 'Beklenmeyen bir hata oluştu. Lütfen tekrar dene.',
-          err.fields
+          err.code || (res.status === 504 ? 'timeout' : 'unknown'),
+          err.message || (res.status === 504
+            ? 'Analiz beklenenden uzun sürdü. Lütfen tekrar dene.'
+            : 'Beklenmeyen bir hata oluştu. Lütfen tekrar dene.'),
+          err.fields,
+          err
         );
       });
     });

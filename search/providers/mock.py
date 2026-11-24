@@ -13,7 +13,7 @@ NOT_A_PRODUCT_WORDS = ("şiir", "siir", "poem", "hikaye", "fıkra")
 
 
 class MockProvider:
-    def analyze(self, system_prompt, user_prompt, *, country):
+    def analyze(self, system_prompt, user_prompt, *, country, use_search=True):
         time.sleep(getattr(settings, "MOCK_DELAY_SECONDS", 1.5))  # fake latency
         lowered = user_prompt.lower()
         query_part = lowered.split("<user_query>")[-1].split("</user_query>")[0]

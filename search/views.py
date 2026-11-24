@@ -4,15 +4,17 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from pydantic import ValidationError
 
-from .services.analyzer import AnalysisError, analyze
+from .services.analyzer import AnalysisError, run_search
 from .services.countries import detect_country
 from .services.schema import SearchRequest, error_fields
 
 
-def _error(status, code, message, fields=None):
+def _error(status, code, message, fields=None, extra=None):
     body = {"error": {"code": code, "message": message}}
     if fields:
         body["error"]["fields"] = fields
+    if extra:
+        body["error"].update(extra)
     return JsonResponse(body, status=status)
 
 
@@ -33,8 +35,8 @@ def search_api(request):
 
     country = detect_country(request, req.country)
     try:
-        data = analyze(req, country)
+        data, cached, remaining = run_search(request, req, country)
     except AnalysisError as exc:
-        return _error(exc.status, exc.code, exc.message)
+        return _error(exc.status, exc.code, exc.message, extra=exc.extra)
 
-    return JsonResponse({"cached": False, "data": data, "remaining": None})
+    return JsonResponse({"cached": cached, "data": data, "remaining": remaining})

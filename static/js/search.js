@@ -21,7 +21,7 @@
 
   var STAGES = ['Mağazalar taranıyor…', 'Puanlar karşılaştırılıyor…', 'Liste hazırlanıyor…'];
   var COUNTRY_KEY = 'bestory-country';
-  var state = { data: null, sort: 'recommended', cached: false, controller: null, timer: null, lastPayload: null };
+  var state = { data: null, sort: 'recommended', cached: false, remaining: null, controller: null, timer: null, lastPayload: null };
 
   /* ---------- form helpers ---------- */
 
@@ -158,7 +158,7 @@
     box.setAttribute('role', 'alert');
     var titles = {
       not_a_product: 'Bu bir ürün gibi görünmüyor',
-      rate_limited: 'Arama limitine ulaştın',
+      rate_limited: 'Günlük arama limitine ulaştın',
       timeout: 'Analiz çok uzun sürdü',
       provider_error: 'Sonuçlar derlenemedi',
       invalid: 'Aramayı kontrol et',
@@ -171,9 +171,11 @@
     retry.type = 'button';
     retry.addEventListener('click', function () { run(state.lastPayload || getPayload()); });
     actions.appendChild(retry);
-    if (err.code === 'rate_limited') {
+    // The server only sends signup_url for anonymous users once the page exists.
+    var signupUrl = err.detail && err.detail.signup_url;
+    if (err.code === 'rate_limited' && typeof signupUrl === 'string' && signupUrl.charAt(0) === '/') {
       var join = R.el('a', 'btn btn-secondary', 'Ücretsiz üye ol');
-      join.href = '/hesap/kayit/';
+      join.href = signupUrl;
       actions.appendChild(join);
     }
     box.appendChild(actions);
@@ -194,6 +196,9 @@
       ? countrySelect.options[countrySelect.selectedIndex].text : data.country;
     meta.appendChild(R.el('span', 'tag', countryName + ' · ' + data.currency));
     if (state.cached) meta.appendChild(R.el('span', 'tag', 'önbellekten'));
+    if (typeof state.remaining === 'number') {
+      meta.appendChild(R.el('span', 'tag', 'Kalan arama hakkın: ' + state.remaining));
+    }
     summary.appendChild(meta);
     head.appendChild(summary);
 
@@ -285,6 +290,7 @@
       clearTimeout(timeout);
       state.data = body.data;
       state.cached = !!body.cached;
+      state.remaining = typeof body.remaining === 'number' ? body.remaining : null;
       state.sort = 'recommended';
       showResults();
     }).catch(function (err) {

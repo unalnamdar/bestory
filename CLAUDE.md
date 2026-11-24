@@ -194,7 +194,7 @@ class LLMProvider(Protocol):
 ```
 - `MockProvider`: `fixtures/` içindeki JSON'u döndürür (kısa yapay gecikmeyle). Faz 1'de ve testlerde kullanılır.
 - `AnthropicProvider`: Messages API + **web search tool**. Kurallar:
-  - Model `LLM_MODEL` env değişkeninden okunur (ör. `claude-sonnet-5-5`; daha ucuz seçenek `claude-haiku-5-5`). Güncel model adlarını ve web search tool sürümünü dokümandan doğrula.
+  - Model `ANTHROPIC_MODEL` env değişkeninden okunur (eski adı `LLM_MODEL` geri uyumluluk için hâlâ okunur; Gemini için `GEMINI_MODEL`) (ör. `claude-sonnet-5-5`; daha ucuz seçenek `claude-haiku-5-5`). Güncel model adlarını ve web search tool sürümünü dokümandan doğrula.
   - Web aramasına `max_uses` limiti koy (varsayılan `LLM_MAX_SEARCHES=5`).
   - Ülkeye göre `user_location` parametresi destekleniyorsa ver.
   - Web search hataları HTTP 200 içinde `web_search_tool_result_error` olarak dönebilir; bunu yakala.
@@ -427,7 +427,9 @@ DATABASE_URL=postgresql://postgres.<ref>:<password>@<pooler-host>:6543/postgres
 
 LLM_PROVIDER=mock               # mock | anthropic
 ANTHROPIC_API_KEY=
-LLM_MODEL=claude-sonnet-5-5
+ANTHROPIC_MODEL=claude-sonnet-5-5
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.5-flash-lite
 LLM_MAX_SEARCHES=5
 LLM_TIMEOUT_SECONDS=90
 
@@ -479,7 +481,7 @@ Gizli değerler asla koda veya repoya yazılmaz. `.env` `.gitignore`'da olmalı.
 |---|---|---|
 | 0 | Kurulum, iskelet, Supabase + Vercel bağlantısı | ✅ (canlı: https://bestory.vercel.app) |
 | 1 | Arayüz, tasarım sistemi, dark mode (mock verilerle) | ✅ Kod hazır; kullanıcı gözle doğrulayacak |
-| 2 | Gerçek analiz motoru (LLM + web search, cache, rate limit) | ⬜ |
+| 2 | Gerçek analiz motoru (LLM + web search, cache, rate limit) | 🟨 Kod + testler hazır (Anthropic, Gemini, Tavily+Gemini); canlı arama anahtar bekliyor |
 | 3 | Üyelik sistemi (kayıt, giriş, çıkış, profil) | ⬜ |
 | 4 | Cilalama ve production yayını | ⬜ |
 
@@ -667,6 +669,16 @@ yaz. Faz tablosunu güncelle ve dur.
 - **Ölçüler:** kullanıcı geri bildirimiyle arayüz sıkılaştırıldı: taban font 15px, düğme/input ~40-42px, kart dolgusu 16px, `--max-width` 1100px (spec'te 1200px'ti).
 - **Mock sağlayıcı:** `MOCK_DELAY_SECONDS` (varsayılan 1,5) yapay gecikme; sorguda "şiir/poem/hikaye/fıkra" geçerse `not_a_product` (422) döner. Mod ve filtreler fixture üzerinde `shape_for_request` ile uygulanır (yalnızca mock). Fixture ürünleri yapay örneklerdir.
 - Faz 1'de header'da giriş/kayıt bağlantıları yok (Faz 3'te eklenecek). `schema.py`, `prompts.py`, `countries.py`, `analyzer.py` iskeleti Faz 1'de açıldı; cache, rate limit, SearchLog ve JSON düzeltme denemesi Faz 2'de.
+- **Faz 2 — web search (docs 2026-11-24):** araç `web_search_20250305` (temel sürüm; yeni sürümler dinamik filtreleme/kod çalıştırma ekliyor, gerek yok). `user_location` ülke + saat dilimi ile verilir. JSON şema (structured output) ile web search birlikteliği dokümanda doğrulanamadığı için JSON prompt ile istenir, `extract_json` + pydantic ile doğrulanır. `pause_turn`'de yanıt olduğu gibi geri gönderilir (en fazla 2). `claude-sonnet-5-5` ve `claude-haiku-5-5` geçerli model adları.
+- **Gemini sağlayıcısı (Faz 2 eki, kullanıcı isteği):** `LLM_PROVIDER=gemini`, `GEMINI_API_KEY`, `GEMINI_MODEL` (varsayılan `gemini-3.5-flash-lite`). Paket: `google-genai==3.6.1` (kullanıcı onayıyla eklendi). Interactions API (`client.interactions.create`, `tools=[{"type": "google_search"}]`, `store=False`, sayısal `timeout` toplam süre bütçesi). Doküman (2026-11-24): Gemini 3+ modellerinde Google Search ücretsiz katmanda yok; ücretli katmanda 5.000 arama/ay sonrası 14 USD/1000, günlük 1.500 sınırı; arama sayısı kısıtlanamaz, ülkeye göre yönlendirme yok. Yapılandırılmış çıktı + arama yalnızca Gemini 3/4'te belgelenmiş, bu yüzden JSON yine prompt ile isteniyor. Varsayılan sağlayıcı kodda `mock` kalır; hangisinin kullanılacağı `.env` ile seçilir.
+- **Tavily + Gemini sağlayıcısı (`LLM_PROVIDER=tavily_gemini`):** Tavily REST (`POST https://api.tavily.com/search`, `Bearer`, standart kütüphane `urllib`, yeni paket yok; basic arama 1 kredi, ücretsiz plan 1.000 kredi/ay, 100 istek/dk, kart yok) + aramasız Gemini. Mod ve ülkeye göre en fazla 3 yerel dilde sorgu paralel çalışır; ~20 özet (600 karakter) `<search_results>` içinde veri olarak verilir, `<`/`>` etkisizleştirilir. Kaynak allow-list: `provider.allowed_source_urls` ayarlıysa analyzer `restrict_sources` ile yalnızca verilen URL'leri bırakır (JSON düzeltme yolu dahil). `extract_json` `services/jsonutil.py`'a taşındı. **Canlı deneme (2026-11-25, "kablosuz kulaklık / TR / fiyat-performans"):** Tavily 3 arama × 8 sonuç; `gemini-3.6-flash` ile 49,5 sn, 7 geçerli ürün (7/7 fiyat, 3/7 puan, tüm URL'ler Tavily sonuçlarından; sayılar ham özetlerde doğrulandı); `gemini-3.5-flash-lite` ile 10,5 sn ama yalnızca 3 ürün (bazılarında fiyat yok). Büyük isteklerde `gemini-3.5-flash-lite` ve diğer modeller zaman zaman 503 "high demand" verdi → aynı modelde 1 yeniden deneme + `GEMINI_FALLBACK_MODEL` (varsayılan `gemini-3.6-flash`). Sınır: kaynaklar çoğunlukla kategori/liste sayfaları (ör. Hepsiburada kategorisi), tekil ürün sayfası değil; token ~5 bin giriş / 1,3–2,9 bin çıkış.
+- **Canlı deneme (2026-11-24, Gemini, ücretsiz anahtar):** aramasız çağrı çalıştı; Google Search'lü çağrı her seferinde 429 "You exceeded your current quota, please check your plan and billing details" döndü → ücretsiz katmanda arama kotası yok, faturalandırma gerekli. Interactions API hataları özel bir modülden (`RateLimitError` vb.) geldiği için `status_code` ile ayırt ediliyor; SDK yeniden denemeleri kapatıldı (`HttpRetryOptions(attempts=1)`), aksi halde tek istek 123 sn sürüyordu. `live_check.py`: DB'ye yazmadan tek canlı analiz çalıştırır.
+- **Kaynak linkleri riski (Gemini):** ürün kaynakları modelin JSON'unda yazar; Gemini grounding yönlendirme (redirect) linkleri verebilir ve dokümanda belirtilmemiş. İlk canlı denemede linkleri kontrol et.
+- **Cache anahtarı** spec'e ek olarak `provider` içerir (mock sonuçları gerçek sağlayıcıya geçince servis edilmesin).
+- **SearchLog:** `invalid` (400) istekler loglanmaz (LLM'e gitmez, kötüye kullanımla tablo şişmesin). Limite yalnızca LLM'e giden denemeler sayılır: `ok`, `provider_error`, `timeout`, `not_a_product` (cache isabeti ve `rate_limited` sayılmaz).
+- **JSON düzeltme denemesi:** çıktı JSON değilse ya da `products` yoksa tek sefer, web search'süz (`use_search=False`, 30 sn) ucuz bir çağrı yapılır.
+- **Vercel `maxDuration` = 135 sn** (`vercel.json`, `bestory/wsgi.py` anahtarı): 90 sn LLM + 30 sn düzeltme denemesi + 15 sn pay. Hobby üst sınır 300 sn.
+- **429 yanıtı** `retry_after` (sn) ve (üye olmayanlar için, kayıt sayfası varsa) `signup_url` taşır. Kayıt sayfası Faz 3'te `accounts:register` adıyla eklenecek.
 - Ham `.env` hiçbir yerde commit'lenmez; `check_setup.py` yardımcı kontrol betiğidir.
 
 ---

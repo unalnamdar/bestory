@@ -2,13 +2,13 @@
 from django.conf import settings
 
 COUNTRIES = {
-    "TR": {"name": "Türkiye", "currency": "TRY", "stores": ["Trendyol", "Hepsiburada", "Amazon.com.tr", "n11"]},
-    "US": {"name": "ABD", "currency": "USD", "stores": ["Amazon.com", "Best Buy", "Walmart"]},
-    "DE": {"name": "Almanya", "currency": "EUR", "stores": ["Amazon.de", "Otto", "MediaMarkt"]},
-    "GB": {"name": "Birleşik Krallık", "currency": "GBP", "stores": ["Amazon.co.uk", "Argos", "Currys"]},
-    "FR": {"name": "Fransa", "currency": "EUR", "stores": ["Amazon.fr", "Fnac", "Cdiscount"]},
-    "NL": {"name": "Hollanda", "currency": "EUR", "stores": ["Bol.com", "Coolblue", "Amazon.nl"]},
-    "AZ": {"name": "Azerbaycan", "currency": "AZN", "stores": ["Umico", "Kontakt Home", "Irshad"]},
+    "TR": {"name": "Türkiye", "currency": "TRY", "stores": ["Trendyol", "Hepsiburada", "Amazon.com.tr", "n11"], "timezone": "Europe/Istanbul", "tavily_country": "turkey"},
+    "US": {"name": "ABD", "currency": "USD", "stores": ["Amazon.com", "Best Buy", "Walmart"], "timezone": "America/New_York", "tavily_country": "united states"},
+    "DE": {"name": "Almanya", "currency": "EUR", "stores": ["Amazon.de", "Otto", "MediaMarkt"], "timezone": "Europe/Berlin", "tavily_country": "germany"},
+    "GB": {"name": "Birleşik Krallık", "currency": "GBP", "stores": ["Amazon.co.uk", "Argos", "Currys"], "timezone": "Europe/London", "tavily_country": "united kingdom"},
+    "FR": {"name": "Fransa", "currency": "EUR", "stores": ["Amazon.fr", "Fnac", "Cdiscount"], "timezone": "Europe/Paris", "tavily_country": "france"},
+    "NL": {"name": "Hollanda", "currency": "EUR", "stores": ["Bol.com", "Coolblue", "Amazon.nl"], "timezone": "Europe/Amsterdam", "tavily_country": "netherlands"},
+    "AZ": {"name": "Azerbaycan", "currency": "AZN", "stores": ["Umico", "Kontakt Home", "Irshad"], "timezone": "Asia/Baku", "tavily_country": "azerbaijan"},
 }
 
 

@@ -145,7 +145,13 @@ STORAGES = {
 
 LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "mock")
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
-LLM_MODEL = os.environ.get("LLM_MODEL", "claude-sonnet-5-5")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY", "")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
+# Tried when GEMINI_MODEL keeps answering 503 "high demand" (empty string disables the fallback).
+GEMINI_FALLBACK_MODEL = os.environ.get("GEMINI_FALLBACK_MODEL", "gemini-3.6-flash")
+# ANTHROPIC_MODEL replaces the old generic LLM_MODEL name (still read as a fallback).
+ANTHROPIC_MODEL = os.environ.get("ANTHROPIC_MODEL") or os.environ.get("LLM_MODEL") or "claude-sonnet-5-5"
 LLM_MAX_SEARCHES = int(os.environ.get("LLM_MAX_SEARCHES", "5"))
 LLM_TIMEOUT_SECONDS = int(os.environ.get("LLM_TIMEOUT_SECONDS", "90"))
 MOCK_DELAY_SECONDS = float(os.environ.get("MOCK_DELAY_SECONDS", "1.5"))  # fake latency for the mock provider
