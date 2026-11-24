@@ -5,8 +5,10 @@ validate (view) -> cache lookup -> rate limit -> prompts -> provider -> extract 
 """
 import json
 import logging
+import re
 import time
 from datetime import datetime, timezone
+from urllib.parse import quote_plus
 
 from django.conf import settings
 from django.urls import NoReverseMatch, reverse
@@ -67,6 +69,38 @@ def restrict_sources(data, allowed):
     return data
 
 
+_PRODUCT_URL_RE = re.compile(
+    r"(-p-[A-Za-z0-9]+|/dp/|/urun/|/product/|/p/\d|-fiyati,\d+|-fiyatlari,\d+|,\d{6,}\.html)", re.I
+)
+
+
+def looks_like_product_url(url):
+    return bool(_PRODUCT_URL_RE.search(url or ""))
+
+
+def add_compare_links(data, country):
+    """Give products that only have category/article sources a working product-search link.
+
+    The link is built by code from the product name (never by the model), so it cannot be
+    made up. Products that lost all their sources stay without any and are dropped later.
+    """
+    spec = COUNTRIES[country].get("compare_search")
+    if not spec:
+        return data
+    title, template = spec
+    for item in data.get("products") or []:
+        if not isinstance(item, dict):
+            continue
+        sources = item.get("sources")
+        name = " ".join(str(item.get("name") or "").split())[:80]
+        if not name or not isinstance(sources, list) or not sources:
+            continue
+        if any(looks_like_product_url(s.get("url")) for s in sources if isinstance(s, dict)):
+            continue
+        sources.insert(0, {"title": title, "url": template.format(q=quote_plus(name))})
+    return data
+
+
 def build_result(data, req, country):
     """Validate products one by one, drop invalid ones, enforce limit, re-rank."""
     info = COUNTRIES[country]
@@ -123,6 +157,8 @@ def analyze(req, country):
         data = restrict_sources(data, allowed)
     if settings.LLM_PROVIDER == "mock":
         data = shape_for_request(data, req)
+    else:
+        data = add_compare_links(data, country)
     return build_result(data, req, country)
 
 

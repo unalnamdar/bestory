@@ -29,8 +29,12 @@ class TavilyClient:
             logger.error("TAVILY_API_KEY is empty")
             raise ProviderError(MSG_NO_SEARCH)
 
-    def search(self, query, *, country_name=None, max_results=8, timeout=20):
-        """Run one basic search (1 credit). Returns the list of result dicts."""
+    def search(self, query, *, country_name=None, max_results=8, timeout=20, include_domains=None):
+        """Run one basic search (1 credit). Returns the list of result dicts.
+
+        include_domains is sent with include_domains_mode="prefer": results from those sites are
+        favoured but other sites can still appear ("restrict" would return nothing for thin queries).
+        """
         body = {
             "query": query,
             "search_depth": "basic",
@@ -39,6 +43,9 @@ class TavilyClient:
         }
         if country_name:
             body["country"] = country_name
+        if include_domains:
+            body["include_domains"] = list(include_domains)
+            body["include_domains_mode"] = "prefer"
         request = urllib.request.Request(
             SEARCH_URL,
             data=json.dumps(body).encode("utf-8"),

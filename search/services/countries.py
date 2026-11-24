@@ -1,14 +1,53 @@
 """Supported countries, currencies and store hints (hints, not mandatory sources)."""
 from django.conf import settings
 
+# stores = display names used in prompts; store_domains / comparison_sites = domains that the
+# Tavily search prefers (not exclusive). compare_search = code-built product search link used as
+# an extra source when the model only found category/article pages (Turkey only: verified).
 COUNTRIES = {
-    "TR": {"name": "Türkiye", "currency": "TRY", "stores": ["Trendyol", "Hepsiburada", "Amazon.com.tr", "n11"], "timezone": "Europe/Istanbul", "tavily_country": "turkey"},
-    "US": {"name": "ABD", "currency": "USD", "stores": ["Amazon.com", "Best Buy", "Walmart"], "timezone": "America/New_York", "tavily_country": "united states"},
-    "DE": {"name": "Almanya", "currency": "EUR", "stores": ["Amazon.de", "Otto", "MediaMarkt"], "timezone": "Europe/Berlin", "tavily_country": "germany"},
-    "GB": {"name": "Birleşik Krallık", "currency": "GBP", "stores": ["Amazon.co.uk", "Argos", "Currys"], "timezone": "Europe/London", "tavily_country": "united kingdom"},
-    "FR": {"name": "Fransa", "currency": "EUR", "stores": ["Amazon.fr", "Fnac", "Cdiscount"], "timezone": "Europe/Paris", "tavily_country": "france"},
-    "NL": {"name": "Hollanda", "currency": "EUR", "stores": ["Bol.com", "Coolblue", "Amazon.nl"], "timezone": "Europe/Amsterdam", "tavily_country": "netherlands"},
-    "AZ": {"name": "Azerbaycan", "currency": "AZN", "stores": ["Umico", "Kontakt Home", "Irshad"], "timezone": "Asia/Baku", "tavily_country": "azerbaijan"},
+    "TR": {
+        "name": "Türkiye", "currency": "TRY", "timezone": "Europe/Istanbul", "tavily_country": "turkey",
+        "stores": ["Trendyol", "Hepsiburada", "Amazon.com.tr", "n11"],
+        "store_domains": ["trendyol.com", "hepsiburada.com", "n11.com", "amazon.com.tr"],
+        "comparison_sites": ["akakce.com", "cimri.com", "epey.com"],
+        "compare_search": ("Akakçe'de bu ürünü ara", "https://www.akakce.com/arama/?q={q}"),
+    },
+    "US": {
+        "name": "ABD", "currency": "USD", "timezone": "America/New_York", "tavily_country": "united states",
+        "stores": ["Amazon.com", "Best Buy", "Walmart"],
+        "store_domains": ["amazon.com", "bestbuy.com", "walmart.com"],
+        "comparison_sites": [],
+    },
+    "DE": {
+        "name": "Almanya", "currency": "EUR", "timezone": "Europe/Berlin", "tavily_country": "germany",
+        "stores": ["Amazon.de", "Otto", "MediaMarkt"],
+        "store_domains": ["amazon.de", "otto.de", "mediamarkt.de"],
+        "comparison_sites": ["idealo.de", "geizhals.de"],
+    },
+    "GB": {
+        "name": "Birleşik Krallık", "currency": "GBP", "timezone": "Europe/London", "tavily_country": "united kingdom",
+        "stores": ["Amazon.co.uk", "Argos", "Currys"],
+        "store_domains": ["amazon.co.uk", "argos.co.uk", "currys.co.uk"],
+        "comparison_sites": ["pricerunner.com", "idealo.co.uk"],
+    },
+    "FR": {
+        "name": "Fransa", "currency": "EUR", "timezone": "Europe/Paris", "tavily_country": "france",
+        "stores": ["Amazon.fr", "Fnac", "Cdiscount"],
+        "store_domains": ["amazon.fr", "fnac.com", "cdiscount.com"],
+        "comparison_sites": ["idealo.fr"],
+    },
+    "NL": {
+        "name": "Hollanda", "currency": "EUR", "timezone": "Europe/Amsterdam", "tavily_country": "netherlands",
+        "stores": ["Bol.com", "Coolblue", "Amazon.nl"],
+        "store_domains": ["bol.com", "coolblue.nl", "amazon.nl"],
+        "comparison_sites": ["tweakers.net", "kieskeurig.nl"],
+    },
+    "AZ": {
+        "name": "Azerbaycan", "currency": "AZN", "timezone": "Asia/Baku", "tavily_country": "azerbaijan",
+        "stores": ["Umico", "Kontakt Home", "Irshad"],
+        "store_domains": ["umico.az", "kontakt.az", "irshad.az"],
+        "comparison_sites": [],
+    },
 }
 
 

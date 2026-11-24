@@ -11,7 +11,7 @@ from search.providers.tavily import TavilyClient
 from search.providers.tavily_gemini_provider import (
     EXTRA_SYSTEM_RULES, TavilyGeminiProvider, build_queries, parse_request,
 )
-from search.services.analyzer import build_result, restrict_sources
+from search.services.analyzer import add_compare_links, build_result, looks_like_product_url, restrict_sources
 from search.services.countries import COUNTRIES
 from search.services.prompts import SYSTEM_PROMPT, build_user_prompt
 from search.services.schema import SearchRequest
@@ -59,6 +59,20 @@ class TavilyClientTests(SimpleTestCase):
                                 "max_results": 8, "country": "turkey"})
         self.assertEqual(urlopen.call_args.kwargs["timeout"], 7)
         self.assertEqual(results, payload["results"])
+
+    def test_include_domains_are_sent_as_prefer(self):
+        with mock.patch("urllib.request.urlopen", return_value=FakeResponse({"results": []})) as urlopen:
+            TavilyClient().search("x", include_domains=["akakce.com", "cimri.com"])
+        body = json.loads(urlopen.call_args.args[0].data)
+        self.assertEqual(body["include_domains"], ["akakce.com", "cimri.com"])
+        self.assertEqual(body["include_domains_mode"], "prefer")  # never "restrict": thin queries must not return nothing
+
+    def test_domains_omitted_by_default(self):
+        with mock.patch("urllib.request.urlopen", return_value=FakeResponse({"results": []})) as urlopen:
+            TavilyClient().search("x")
+        body = json.loads(urlopen.call_args.args[0].data)
+        self.assertNotIn("include_domains", body)
+        self.assertNotIn("include_domains_mode", body)
 
     def test_country_omitted_when_unknown(self):
         with mock.patch("urllib.request.urlopen", return_value=FakeResponse({"results": []})) as urlopen:
@@ -111,14 +125,27 @@ class QueryBuildingTests(SimpleTestCase):
     @override_settings(LLM_MAX_SEARCHES=5)
     def test_turkish_queries_for_turkey(self):
         queries = build_queries("kablosuz kulaklık", "value", "", "TR")
+        texts = [q for q, _ in queries]
         self.assertEqual(len(queries), 3)
-        self.assertIn("fiyat performans en iyi kablosuz kulaklık", queries)
-        self.assertTrue(any("Trendyol" in q for q in queries))
+        self.assertIn("fiyat performans en iyi kablosuz kulaklık", texts)
+        self.assertTrue(any("Trendyol" in q for q in texts))
+
+    @override_settings(LLM_MAX_SEARCHES=5)
+    def test_queries_steer_to_comparison_sites_and_stores(self):
+        (_, first_domains), (_, second_domains), (_, third_domains) = build_queries("kulaklık", "value", "", "TR")
+        self.assertEqual(first_domains, ["akakce.com", "cimri.com", "epey.com"])  # price comparison sites
+        self.assertIsNone(second_domains)  # editorial/review pages stay unrestricted
+        self.assertEqual(third_domains, ["trendyol.com", "hepsiburada.com", "n11.com", "amazon.com.tr"])
+
+    @override_settings(LLM_MAX_SEARCHES=5)
+    def test_countries_without_comparison_sites_fall_back_to_stores(self):
+        (_, first_domains), *_ = build_queries("headphones", "value", "", "US")
+        self.assertEqual(first_domains, COUNTRIES["US"]["store_domains"])
 
     @override_settings(LLM_MAX_SEARCHES=5)
     def test_custom_mode_uses_custom_text(self):
         queries = build_queries("kulaklık", "custom", "ANC olsun", "TR")
-        self.assertEqual(queries[0], "kulaklık ANC olsun")
+        self.assertEqual(queries[0][0], "kulaklık ANC olsun")
 
     @override_settings(LLM_MAX_SEARCHES=2)
     def test_query_count_respects_max_searches(self):
@@ -130,8 +157,9 @@ class QueryBuildingTests(SimpleTestCase):
             for mode in ("best_sellers", "top_rated", "value", "custom"):
                 with self.subTest(country=country, mode=mode):
                     queries = build_queries("headphones", mode, "wireless", country)
+                    texts = [q for q, _ in queries]
                     self.assertTrue(1 <= len(queries) <= 3)
-                    self.assertEqual(len(queries), len(set(queries)))
+                    self.assertEqual(len(texts), len(set(texts)))
 
 
 GOOD = json.dumps({"summary": "özet", "products": [
@@ -186,6 +214,9 @@ class TavilyGeminiProviderTests(SimpleTestCase):
         self.assertEqual(len(tavily.calls), 3)
         for _, kwargs in tavily.calls:
             self.assertEqual(kwargs["country_name"], "turkey")
+        domains = sorted((kw["include_domains"] or []) for _, kw in tavily.calls)
+        self.assertIn(["akakce.com", "cimri.com", "epey.com"], domains)  # comparison-site steering reached Tavily
+        self.assertIn([], domains)  # the unsteered editorial query
         call = gemini.calls[0]
         self.assertFalse(call["use_search"])  # Gemini gets no search tool: Tavily is the source
         self.assertIn(EXTRA_SYSTEM_RULES, call["system"])
@@ -275,7 +306,9 @@ class TavilyGeminiEndToEndTests(TestCase):
         self.assertEqual(first.status_code, 200)
         products = first.json()["data"]["products"]
         self.assertEqual([p["name"] for p in products], ["Gerçek"])
-        self.assertEqual([s["url"] for s in products[0]["sources"]], ["https://shop.example/a"])
+        urls = [s["url"] for s in products[0]["sources"]]
+        # first the code-built Akakce search link (the only real page was a category page), then the real source
+        self.assertEqual(urls, ["https://www.akakce.com/arama/?q=Ger%C3%A7ek", "https://shop.example/a"])
         self.assertTrue(second.json()["cached"])
         self.assertEqual(len(tavily.calls), 3)  # the cached request used no credits
 
@@ -284,3 +317,53 @@ class TavilyGeminiEndToEndTests(TestCase):
             resp = self.post({"query": "anahtarsız tavily"})
         self.assertEqual(resp.status_code, 502)
         self.assertNotIn("TAVILY", resp.content.decode())
+
+
+class CompareLinkTests(SimpleTestCase):
+    def product(self, name="Xiaomi Redmi Buds 6 Play", *urls):
+        return {"name": name, "sources": [{"title": "t", "url": u} for u in urls]}
+
+    def test_product_page_detection(self):
+        for url in ("https://www.hepsiburada.com/xiaomi-buds-p-HBCV0000A1B2C3",
+                    "https://www.trendyol.com/xiaomi/redmi-buds-p-123456789",
+                    "https://www.amazon.com.tr/Xiaomi-Buds/dp/B0ABC12345",
+                    "https://www.n11.com/urun/xiaomi-buds-12345",
+                    "https://www.akakce.com/kulaklik/en-ucuz-xiaomi-redmi-buds-6-play-fiyati,1234567890.html"):
+            with self.subTest(url=url):
+                self.assertTrue(looks_like_product_url(url))
+        for url in ("https://www.hepsiburada.com/bluetooth-kulakliklar-c-16218",
+                    "https://www.donanimhaber.com/en-iyi-kablosuz-bluetooth-kulaklik-onerileri--162987",
+                    "https://www.akakce.com/bluetooth-kulaklik.html", "", None):
+            with self.subTest(url=url):
+                self.assertFalse(looks_like_product_url(url))
+
+    def test_link_added_first_when_only_category_pages(self):
+        data = {"products": [self.product("JBL Tune T500BT", "https://www.hepsiburada.com/bluetooth-kulakliklar-c-16218")]}
+        add_compare_links(data, "TR")
+        sources = data["products"][0]["sources"]
+        self.assertEqual(len(sources), 2)
+        self.assertEqual(sources[0]["url"], "https://www.akakce.com/arama/?q=JBL+Tune+T500BT")
+        self.assertIn("Akakçe", sources[0]["title"])
+
+    def test_no_link_when_a_product_page_exists(self):
+        data = {"products": [self.product("X", "https://www.trendyol.com/x/y-p-1234567", "https://news.example/a")]}
+        add_compare_links(data, "TR")
+        self.assertEqual(len(data["products"][0]["sources"]), 2)
+
+    def test_product_without_sources_is_not_rescued(self):
+        data = {"products": [self.product("Uydurma")]}
+        add_compare_links(data, "TR")
+        self.assertEqual(data["products"][0]["sources"], [])
+
+    def test_other_countries_get_no_generated_link(self):
+        data = {"products": [self.product("X", "https://shop.example/category")]}
+        add_compare_links(data, "DE")
+        self.assertEqual(len(data["products"][0]["sources"]), 1)
+
+    def test_name_is_url_encoded_and_truncated(self):
+        data = {"products": [self.product("A&B=C/Ü " * 20, "https://shop.example/list")]}
+        add_compare_links(data, "TR")
+        link = data["products"][0]["sources"][0]["url"]
+        self.assertTrue(link.startswith("https://www.akakce.com/arama/?q="))
+        self.assertNotIn("&B", link)
+        self.assertLess(len(link), 400)

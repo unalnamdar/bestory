@@ -56,6 +56,9 @@ IMPORTANT - how you get your data in this run:
 - A product's sources may ONLY be URLs that appear in <search_results> (copy them exactly).
   Skip any product you cannot support with at least one such URL.
 - Prefer products that appear in several results, and results from the given country's stores.
+- Prices and ratings: prefer price-comparison sites and store pages in the results over blog or
+  video pages. When a product has a product-specific page in the results (not a category, list
+  or article page), use that URL as its first source.
 """
 
 _QUERY_RE = re.compile(r"<user_query>(.*?)</user_query>", re.S)
@@ -76,22 +79,33 @@ def parse_request(user_prompt):
 
 
 def build_queries(query, mode, custom, country):
+    """Return up to 3 (query_text, preferred_domains) pairs.
+
+    1) the mode query, steered to price-comparison sites (they list prices and ratings),
+    2) a price/reviews query without domain steering (editorial and review pages),
+    3) a store query steered to the country's store domains (product listings).
+    """
+    info = COUNTRIES[country]
     phrases = PHRASES.get(country, PHRASES["US"])
-    stores = " ".join(COUNTRIES[country]["stores"][:2])
+    stores = " ".join(info["stores"][:2])
     first = {
         "best_sellers": phrases["best_sellers"],
         "top_rated": phrases["top_rated"],
         "value": phrases["value"],
         "custom": "{q} " + custom,
     }.get(mode, phrases["best_sellers"]).format(q=query)
-    queries = [first, phrases["price"].format(q=query), f"{query} {stores}"]
-    if mode == "custom":
-        queries[1] = phrases["top_rated"].format(q=query)
-    unique = []
-    for q in queries:
-        q = " ".join(q.split())[:300]
-        if q and q not in unique:
-            unique.append(q)
+    second = phrases["top_rated"] if mode == "custom" else phrases["price"]
+    plan = [
+        (first, info.get("comparison_sites") or info.get("store_domains")),
+        (second.format(q=query), None),
+        (f"{query} {stores}", info.get("store_domains")),
+    ]
+    unique, seen = [], set()
+    for text, domains in plan:
+        text = " ".join(text.split())[:300]
+        if text and text not in seen:
+            seen.add(text)
+            unique.append((text, list(domains) if domains else None))
     return unique[: max(1, min(MAX_QUERIES, settings.LLM_MAX_SEARCHES))]
 
 
@@ -123,9 +137,10 @@ class TavilyGeminiProvider:
     def _search_all(self, queries, country):
         country_name = COUNTRIES[country].get("tavily_country")
 
-        def one(q):
-            return self.tavily.search(q, country_name=country_name, max_results=RESULTS_PER_QUERY,
-                                      timeout=TAVILY_TIMEOUT_SECONDS)
+        def one(item):
+            text, domains = item
+            return self.tavily.search(text, country_name=country_name, max_results=RESULTS_PER_QUERY,
+                                      timeout=TAVILY_TIMEOUT_SECONDS, include_domains=domains)
 
         errors, batches = [], []
         with ThreadPoolExecutor(max_workers=len(queries)) as pool:
@@ -152,7 +167,7 @@ class TavilyGeminiProvider:
                 merged.append({"url": url, "title": (item.get("title") or "").strip(),
                                "content": (item.get("content") or "").strip()})
         if not merged:
-            logger.error("Tavily returned no usable results for %s", queries)
+            logger.error("Tavily returned no usable results for %s", [q for q, _ in queries])
             raise ProviderError("Bu ürün için web'de yeterli bilgi bulunamadı. Başka bir ifadeyle dene.")
         return merged[:MAX_SNIPPETS]
 
