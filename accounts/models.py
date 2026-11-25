@@ -61,3 +61,14 @@ class User(AbstractUser):
 
     def get_short_name(self):
         return self.username
+
+
+class LoginAttempt(models.Model):
+    """One row per FAILED sign-in, used to throttle guessing (see accounts/throttle.py).
+
+    Only salted hashes are stored: never the raw IP and never the typed identifier.
+    """
+
+    ip_hash = models.CharField(max_length=64, db_index=True)
+    identifier_hash = models.CharField(max_length=64, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)

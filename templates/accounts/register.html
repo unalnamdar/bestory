@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Kayıt ol — Bestory{% endblock %}
+
+{% block content %}
+<section class="auth container">
+  <div class="auth-card">
+    <h1>Kayıt ol</h1>
+    <p class="auth-sub">Ücretsiz üye ol, günde daha fazla analiz yap. Üye olmadan da arama yapabilirsin.</p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      {% if form.non_field_errors %}
+        <ul class="form-errors" role="alert">{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+      {% endif %}
+      {% for field in form %}
+        {% include "partials/form_field.html" with field=field %}
+      {% endfor %}
+      <button class="btn btn-primary auth-submit" type="submit">Kayıt ol</button>
+    </form>
+
+    <p class="auth-switch">Zaten üye misin? <a href="{% url 'accounts:login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Giriş yap</a></p>
+  </div>
+</section>
+{% endblock %}

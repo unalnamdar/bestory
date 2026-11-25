@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Profil — Bestory{% endblock %}
+
+{% block content %}
+<section class="auth container">
+  <div class="auth-card">
+    <h1>Profil</h1>
+    <dl class="profile-list">
+      <div><dt>Kullanıcı adı</dt><dd>{{ user.username }}</dd></div>
+      <div>
+        <dt>E-posta</dt>
+        <dd>{{ user.email }}</dd>
+        <dd class="form-hint">Yalnızca sen görürsün; başkalarına gösterilmez.</dd>
+      </div>
+      <div><dt>Katılma tarihi</dt><dd>{{ user.date_joined|date:"j F Y" }}</dd></div>
+    </dl>
+    <p class="note">Son aramaların burada listelenecek.</p>
+    <form method="post" action="{% url 'accounts:logout' %}">
+      {% csrf_token %}
+      <button class="btn btn-secondary" type="submit">Çıkış yap</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

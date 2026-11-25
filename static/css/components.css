@@ -200,3 +200,33 @@
   margin-top: var(--space-6); padding-block: var(--space-4);
   font-size: 13px; color: var(--text-muted);
 }
+
+/* --- Header account area --- */
+.btn-sm { min-height: 36px; padding: 0 var(--space-3); font-size: 13px; }
+.auth-nav { display: flex; align-items: center; gap: var(--space-2); }
+.user-menu { position: relative; }
+.user-menu summary { list-style: none; cursor: pointer; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; line-height: 34px; padding-block: 0; text-align: center; }
+.user-menu summary::-webkit-details-marker { display: none; }
+.user-menu__panel {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 30; min-width: 160px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  box-shadow: var(--shadow); padding: var(--space-1); display: grid;
+}
+.user-menu__panel a, .user-menu__item {
+  display: block; width: 100%; text-align: left; padding: var(--space-2) var(--space-3);
+  background: none; border: 0; border-radius: 6px; color: var(--text); text-decoration: none; cursor: pointer; font-size: 14px;
+}
+.user-menu__panel a:hover, .user-menu__item:hover { background: var(--surface-2); }
+.user-menu__panel form { margin: 0; }
+
+/* --- Forms --- */
+.form-field { margin-bottom: var(--space-4); }
+.form-hint { font-size: 13px; color: var(--text-muted); margin-top: var(--space-1); }
+.form-errors { list-style: none; margin: var(--space-1) 0 0; padding: 0; color: var(--danger); font-size: 14px; font-weight: 500; }
+.form-errors li + li { margin-top: 2px; }
+form > .form-errors { margin-bottom: var(--space-4); padding: var(--space-3); border: 1px solid var(--danger); border-radius: var(--radius-sm); }
+.input[aria-invalid="true"] { border-color: var(--danger); }
+.profile-list { margin: var(--space-4) 0; display: grid; gap: var(--space-3); }
+.profile-list dt { font-size: 13px; color: var(--text-muted); }
+.profile-list dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.profile-list dd.form-hint { font-weight: 400; }

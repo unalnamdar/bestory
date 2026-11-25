@@ -22,6 +22,14 @@ Copy-Item .env.example .env        # sonra .env içini doldur
 
 `LLM_PROVIDER=mock` iken arama sahte "kablosuz kulaklık" verisi döndürür (1,5 sn yapay gecikme, `MOCK_DELAY_SECONDS`). Her sorgu aynı örnek ürünleri gösterir; mod, bütçe, puan ve sonuç sayısı filtreleri listeye uygulanır. Hata ekranını görmek için "Bana bir şiir yaz" ara (ürün değil → 422). Paylaşılabilir link örneği: `/?q=kablosuz+kulakl%C4%B1k&country=TR&mode=value`.
 
+## Üyelik
+
+- Sayfalar: `/hesap/kayit/`, `/hesap/giris/` (`?next=` destekli), `/hesap/cikis/` (yalnızca POST), `/hesap/profil/`.
+- Giriş e-posta **veya** kullanıcı adıyla yapılır. Kullanıcı adı 3–20 karakter (`a-z`, `0-9`, `_`, `.`), küçük harfe çevrilir; `admin`, `bestory`, `root` gibi adlar yasaktır.
+- E-posta hiçbir herkese açık sayfada, API yanıtında veya günlükte görünmez; yalnızca kendi profil sayfanda.
+- Üyeler günde 20, üye olmayanlar 5 yeni analiz yapabilir. Çok sayıda başarısız girişten sonra kısa süre beklemek gerekir (hesap başına 5, IP başına 10 / 10 dk).
+- **Deploy notu:** Yeni bir migration içeren kodu push etmeden önce `python manage.py migrate` ile Supabase'e uygula (Faz 3: `accounts.0002_loginattempt`), yoksa canlıda başarısız giriş 500 verir.
+
 ## Gerçek analiz (LLM + web araması)
 
 `LLM_PROVIDER` ile sağlayıcı seçilir: `mock` (anahtarsız), `anthropic`, `gemini` veya `tavily_gemini` (ücretsiz katman dostu).
