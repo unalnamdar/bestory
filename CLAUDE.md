@@ -483,7 +483,7 @@ Gizli değerler asla koda veya repoya yazılmaz. `.env` `.gitignore`'da olmalı.
 | 1 | Arayüz, tasarım sistemi, dark mode (mock verilerle) | ✅ Kod hazır; kullanıcı gözle doğrulayacak |
 | 2 | Gerçek analiz motoru (LLM + web search, cache, rate limit) | 🟨 Kod + testler hazır (Anthropic, Gemini, Tavily+Gemini); canlı arama anahtar bekliyor |
 | 3 | Üyelik sistemi (kayıt, giriş, çıkış, profil) | ✅ Canlıda (Supabase `migrate` uygulandı, commit `d746cc0`); kullanıcı canlıda kayıt/giriş akışını gözle doğrulayacak |
-| 4 | Cilalama ve production yayını | 🟨 Kod + testler hazır, lokalde denendi; Supabase `migrate` (search.0002, core.0002), commit/push ve canlı duman testi bekliyor |
+| 4 | Cilalama ve production yayını | ✅ Canlıda (commit `a093f3c`, Supabase migrate uygulandı, Advisors'ta yalnızca beklenen INFO); kullanıcı admin hesabını açıp README duman testini yapacak |
 
 ---
 
