@@ -21,12 +21,17 @@ from ..providers.mock import shape_for_request
 from . import cache, ratelimit
 from .countries import COUNTRIES
 from .jsonutil import extract_json  # noqa: F401  (re-exported)
+from .pricecheck import enforce_filters, verify_evidence
 from .prompts import REPAIR_SYSTEM_PROMPT, SYSTEM_PROMPT, build_repair_prompt, build_user_prompt
 from .schema import Product, SearchResult
 
 logger = logging.getLogger(__name__)
 
 MSG_BAD_RESULT = "Sonuçlar şu an derlenemedi. Lütfen tekrar dene."
+MSG_NO_PRICES = (
+    "Bu arama için güncel fiyatı doğrulanabilen ürün bulunamadı. "
+    "Farklı bir ifade, bütçe veya ölçüt dene."
+)
 MSG_NOT_A_PRODUCT = (
     "Bu bir ürün ya da ürün kategorisi gibi görünmüyor. Satın almak istediğin şeyi yazmayı dene."
 )
@@ -101,18 +106,20 @@ def add_compare_links(data, country):
     return data
 
 
-def build_result(data, req, country):
+def build_result(data, req, country, price_drops=0):
     """Validate products one by one, drop invalid ones, enforce limit, re-rank."""
     info = COUNTRIES[country]
     valid = []
     for item in data.get("products") or []:
         try:
             valid.append(Product.model_validate(item))
-        except ValidationError:
+        except ValidationError as exc:
+            if "price" in str(exc):
+                price_drops += 1  # missing, zero, reversed or implausibly wide price
             continue  # invalid products are discarded
     valid = valid[: req.filters.limit]
     if not valid:
-        raise AnalysisError("provider_error", MSG_BAD_RESULT, 502)
+        raise AnalysisError("provider_error", MSG_NO_PRICES if price_drops else MSG_BAD_RESULT, 502)
     for rank, product in enumerate(valid, start=1):
         product.rank = rank
 
@@ -155,11 +162,19 @@ def analyze(req, country):
     allowed = getattr(provider, "allowed_source_urls", None)
     if allowed is not None:
         data = restrict_sources(data, allowed)
+    # Price rules, applied in code whatever the model returned.
+    price_drops = 0
+    proposed = len(data.get("products") or [])
+    source_texts = getattr(provider, "source_texts", None)
+    if source_texts is not None:
+        price_drops += verify_evidence(data, source_texts)  # quote must be in a real snippet
+    price_drops += enforce_filters(data, req)  # price present and inside the requested budget
+    logger.info("price rules: proposed=%s dropped=%s kept=%s", proposed, price_drops, len(data.get("products") or []))
     if settings.LLM_PROVIDER == "mock":
         data = shape_for_request(data, req)
     else:
         data = add_compare_links(data, country)
-    return build_result(data, req, country)
+    return build_result(data, req, country, price_drops)
 
 
 def _signup_url():

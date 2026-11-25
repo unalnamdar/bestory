@@ -163,7 +163,8 @@ class QueryBuildingTests(SimpleTestCase):
 
 
 GOOD = json.dumps({"summary": "özet", "products": [
-    {"name": "Gerçek", "price_min": 1000, "sources": [
+    {"name": "Gerçek", "price_min": 1299, "price_max": 1299,
+     "price_evidence": {"url": "https://shop.example/a", "quote": "1.299 TL"}, "sources": [
         {"title": "ok", "url": "https://shop.example/a"}, {"title": "uydurma", "url": "https://invented.example/z"}]},
     {"name": "Sadece uydurma", "sources": [{"title": "x", "url": "https://invented.example/q"}]},
 ]})

@@ -56,6 +56,13 @@ IMPORTANT - how you get your data in this run:
 - A product's sources may ONLY be URLs that appear in <search_results> (copy them exactly).
   Skip any product you cannot support with at least one such URL.
 - Prefer products that appear in several results, and results from the given country's stores.
+- Price evidence (mandatory): for EVERY product add
+  "price_evidence": {"url": "<one URL from <search_results>>", "quote": "<text copied EXACTLY,
+  character for character, from that result's snippet; it must contain the price as written
+  there, e.g. 1.299,00 TL; at most 150 characters>"}.
+  price_min must equal a price shown in that quote. The app checks that the quote really
+  appears in the snippet and contains the price; products that fail this check are removed,
+  so skip any product whose price you cannot quote verbatim.
 - Prices and ratings: prefer price-comparison sites and store pages in the results over blog or
   video pages. When a product has a product-specific page in the results (not a category, list
   or article page), use that URL as its first source.
@@ -114,6 +121,7 @@ class TavilyGeminiProvider:
         self.tavily = tavily or TavilyClient()
         self.gemini = gemini or GeminiProvider()
         self.allowed_source_urls = None  # set after a search; enforced by the analyzer
+        self.source_texts = None  # url -> snippet text; used by the analyzer to verify prices
 
     def analyze(self, system_prompt, user_prompt, *, country, use_search=True):
         if not use_search:
@@ -125,6 +133,7 @@ class TavilyGeminiProvider:
         queries = build_queries(query, mode, custom, country)
         results = self._search_all(queries, country)
         self.allowed_source_urls = {r["url"] for r in results}
+        self.source_texts = {r["url"]: f"{r['title']} {r['content']}".strip()[:SNIPPET_CHARS + 200] for r in results}
 
         remaining = settings.LLM_TIMEOUT_SECONDS - (time.monotonic() - started)
         if remaining < MIN_GENERATION_SECONDS:

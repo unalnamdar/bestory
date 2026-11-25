@@ -59,7 +59,12 @@
     return ul;
   }
 
-  function renderCard(p, currency) {
+  function priceDate(iso) {
+    var d = new Date(iso);
+    return isNaN(d.getTime()) ? '' : d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function renderCard(p, currency, generatedAt) {
     var card = el('article', 'card');
 
     var top = el('div', 'card__top');
@@ -109,6 +114,11 @@
 
     var price = priceText(p, currency);
     card.appendChild(price ? el('div', 'price', price) : el('div', 'price price--na', 'Fiyat bilgisi yok'));
+    if (price && p.price_source) {
+      // Only set by the server when the price was verified against a real source page.
+      var when = priceDate(generatedAt);
+      card.appendChild(el('div', 'note', 'Fiyat: ' + p.price_source + (when ? ' · ' + when : '')));
+    }
 
     if (p.popularity_note) card.appendChild(el('p', 'note', p.popularity_note));
     if (p.highlights && p.highlights.length) card.appendChild(list(p.highlights.slice(0, 3), 'highlights'));

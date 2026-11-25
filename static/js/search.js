@@ -234,7 +234,7 @@
     if (!grid) return;
     R.clear(grid);
     R.sortProducts(state.data.products, state.sort).forEach(function (p) {
-      grid.appendChild(R.renderCard(p, state.data.currency));
+      grid.appendChild(R.renderCard(p, state.data.currency, state.data.generated_at));
     });
   }
 

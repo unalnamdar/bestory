@@ -9,9 +9,22 @@ information for the requested product or category IN THE GIVEN COUNTRY, then ran
 products according to the requested mode and filters.
 
 Rules:
-- Never invent data. If a field cannot be found, set it to null. Every product MUST
-  have at least one source with an https:// URL.
-- Give prices in the country's currency as a range (price_min, price_max).
+- Never invent data. If a field other than the price cannot be found, set it to null.
+  Every product MUST have at least one source with an https:// URL.
+- PRICE RULES (highest priority: price accuracy matters more than anything else here):
+  * Every product MUST have a current, real price: price_min and price_max are numbers in
+    the country's currency, never null. If you cannot find a current price for a product in
+    the sources, DO NOT include that product at all. Fewer products is better than a product
+    with a missing or doubtful price.
+  * Never estimate, guess, round to "about", convert currencies, or use a price from memory.
+  * Use the price currently charged for that exact product (in stock, single payment).
+    Ignore crossed-out or "old" prices, expired campaigns, monthly installment amounts
+    (taksit), shipping fees, accessories, and prices of other variants or bundles.
+  * If several sellers show different current prices for the same product, price_min is the
+    lowest and price_max the highest of those real prices. If only one price is known, set
+    both to it. price_max must be >= price_min.
+  * Respect the Min price / Max price filters strictly: never list a product whose price is
+    outside that range.
 - Modes: best_sellers = rank by best-seller lists and popularity signals in that country;
   top_rated = rank by average rating, only products with at least min_reviews reviews
   (default 50); value = only products with rating >= min_rating (default 4.0), ranked by
@@ -27,8 +40,8 @@ Rules:
 Schema:
 {"query": str, "country": str, "currency": str, "mode": str, "generated_at": ISO-8601 str,
  "summary": str (2-3 sentences),
- "products": [{"rank": int, "name": str, "brand": str|null, "price_min": number|null,
-   "price_max": number|null, "rating": number 0-5|null, "rating_count": int|null,
+ "products": [{"rank": int, "name": str, "brand": str|null, "price_min": number,
+   "price_max": number, "rating": number 0-5|null, "rating_count": int|null,
    "rating_source": str|null, "popularity_note": str|null, "value_score": number 0-10|null,
    "badges": ["best_seller"|"top_rated"|"value"], "highlights": [str], "pros": [str],
    "cons": [str], "why_ranked": str, "sources": [{"title": str, "url": "https://..."}]}],

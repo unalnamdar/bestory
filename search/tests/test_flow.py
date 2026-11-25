@@ -19,7 +19,7 @@ User = get_user_model()
 
 GOOD_JSON = json.dumps({
     "summary": "ok",
-    "products": [{"name": "A", "sources": [{"title": "t", "url": "https://example.com/a"}]}],
+    "products": [{"name": "A", "price_min": 100, "sources": [{"title": "t", "url": "https://example.com/a"}]}],
 })
 
 

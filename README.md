@@ -54,6 +54,13 @@ Aramayı Tavily yapar, Gemini (arama aracı olmadan) JSON'u yazar. Gemini'nin ar
 4. Kaynak linkleri yalnızca Tavily'nin döndürdüğü adreslerden seçilebilir; modelin uydurduğu link otomatik atılır.
 5. Sınırlar: Tavily sonuçları kısa özetlerdir (~500 karakter); fiyat/puan çoğu üründe bulunamayabilir ve boş (`null`) kalır. Model sayfaları kendisi gezip ek arama yapamaz.
 
+### Fiyat doğruluğu
+
+- Her üründe güncel fiyat zorunludur; fiyatı belirlenemeyen ürün listelenmez. Aralık tutarlı olmalıdır (`price_max ≥ price_min`, en fazla 3 kat).
+- Bütçe filtresi (en düşük/en yüksek) modele güvenilmeden kodda uygulanır.
+- `tavily_gemini` sağlayıcısında fiyat ayrıca doğrulanır: model, fiyatı gösteren metni arama özetinden birebir alıntılamak zorundadır; alıntı özette yoksa ya da fiyatı içermiyorsa ürün atılır. Kartta "Fiyat: <site> · <tarih>" görünür.
+- `anthropic` ve `gemini` (kendi aramalı) sağlayıcılarda kaynak metni görünmediği için bu kanıt kontrolü yapılamaz.
+
 ### Ortak davranış
 
 - **Önbellek:** aynı (ürün, ülke, mod, filtre, özel istek, sağlayıcı) 24 saat (`CACHE_TTL_HOURS`) saklanır, limitten düşmez. Süresi dolanları silmek için: `python manage.py purge_search_cache`.

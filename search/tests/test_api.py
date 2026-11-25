@@ -129,7 +129,7 @@ class SchemaAndAnalyzerTests(SimpleTestCase):
         return SearchRequest.model_validate({"query": "kablosuz kulaklık", **kw})
 
     def product(self, **kw):
-        base = {"name": "A", "sources": [{"title": "t", "url": "https://example.com/a"}]}
+        base = {"name": "A", "price_min": 100, "sources": [{"title": "t", "url": "https://example.com/a"}]}
         base.update(kw)
         return base
 

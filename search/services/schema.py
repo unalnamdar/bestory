@@ -7,6 +7,7 @@ from .countries import COUNTRIES
 
 MODES = ("best_sellers", "top_rated", "value", "custom")
 BADGES = ("best_seller", "top_rated", "value")
+MAX_PRICE_SPREAD = 3  # price_max may be at most 3x price_min
 
 
 def _clean(text):
@@ -134,8 +135,11 @@ class Product(BaseModel):
     rank: int = 0
     name: str = Field(min_length=1)
     brand: Optional[str] = None
-    price_min: Optional[float] = Field(default=None, ge=0)
-    price_max: Optional[float] = Field(default=None, ge=0)
+    # Price is mandatory: a product without a usable price is never listed.
+    price_min: float = Field(gt=0)
+    price_max: Optional[float] = Field(default=None, gt=0)
+    # Where the price was verified (host name). Set by the app, never trusted from the model.
+    price_source: Optional[str] = None
     rating: Optional[float] = Field(default=None, ge=0, le=5)
     rating_count: Optional[int] = Field(default=None, ge=0)
     rating_source: Optional[str] = None
@@ -147,6 +151,17 @@ class Product(BaseModel):
     cons: list[str] = Field(default_factory=list)
     why_ranked: Optional[str] = None
     sources: list[Source] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _price_consistency(self):
+        if self.price_max is None:
+            self.price_max = self.price_min  # a single known price
+        if self.price_max < self.price_min:
+            raise ValueError("price_max is lower than price_min")
+        if self.price_max > self.price_min * MAX_PRICE_SPREAD:
+            # One product with a >3x price spread usually means variants or accessories were mixed.
+            raise ValueError("price range is too wide to describe one product")
+        return self
 
 
 class SearchResult(BaseModel):
