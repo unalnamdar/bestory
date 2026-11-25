@@ -5,6 +5,7 @@ from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods, require_POST
 
+from search.services.history import recent_searches
 from search.services.ratelimit import client_ip, hash_ip
 
 from . import throttle
@@ -78,4 +79,4 @@ def logout_view(request):
 
 @login_required
 def profile(request):
-    return render(request, "accounts/profile.html")
+    return render(request, "accounts/profile.html", {"recent": recent_searches(request.user)})

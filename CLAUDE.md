@@ -483,7 +483,7 @@ Gizli değerler asla koda veya repoya yazılmaz. `.env` `.gitignore`'da olmalı.
 | 1 | Arayüz, tasarım sistemi, dark mode (mock verilerle) | ✅ Kod hazır; kullanıcı gözle doğrulayacak |
 | 2 | Gerçek analiz motoru (LLM + web search, cache, rate limit) | 🟨 Kod + testler hazır (Anthropic, Gemini, Tavily+Gemini); canlı arama anahtar bekliyor |
 | 3 | Üyelik sistemi (kayıt, giriş, çıkış, profil) | ✅ Canlıda (Supabase `migrate` uygulandı, commit `d746cc0`); kullanıcı canlıda kayıt/giriş akışını gözle doğrulayacak |
-| 4 | Cilalama ve production yayını | ⬜ |
+| 4 | Cilalama ve production yayını | 🟨 Kod + testler hazır, lokalde denendi; Supabase `migrate` (search.0002, core.0002), commit/push ve canlı duman testi bekliyor |
 
 ---
 
@@ -683,6 +683,8 @@ yaz. Faz tablosunu güncelle ve dur.
 - **Vercel `maxDuration` = 135 sn** (`vercel.json`, `bestory/wsgi.py` anahtarı): 90 sn LLM + 30 sn düzeltme denemesi + 15 sn pay. Hobby üst sınır 300 sn.
 - **429 yanıtı** `retry_after` (sn) ve (üye olmayanlar için, kayıt sayfası varsa) `signup_url` taşır. Kayıt sayfası Faz 3'te `accounts:register` adıyla eklenecek.
 - Ham `.env` hiçbir yerde commit'lenmez; `check_setup.py` yardımcı kontrol betiğidir.
+- **Faz 4 — cilalama:** `SearchLog.params` (JSONField, **nullable** — migrate ile yeni deploy arasında eski kod da yazabilsin) arama filtrelerini ve özel metni saklar. Profil son 10 *farklı* başarılı aramayı (`search/services/history.py`, sorgu Türkçe normalize edilerek tekilleştirilir) search.js'in kullandığı parametrelerle link olarak verir → 24 saat içinde aynı cache anahtarı, limitten düşmez. 404/500 şablonları (500, Django'nun boş context'iyle render edilir), `robots.txt` (`/api/`, `/hesap/`, `/admin/` kapalı), `/favicon.ico` → SVG'ye 301, meta description + Open Graph + canonical (sorgu dizesi olmadan) + `robots` bloğu (hesap/hata sayfaları `noindex`). OG görseli yok (PNG üretecek paket eklenmedi). Production: HSTS 1 yıl (`SECURE_HSTS_SECONDS` env ile değiştirilebilir) + `includeSubDomains`; `security.W021` (preload) susturuldu çünkü `*.vercel.app` zaten preload listesinde. `core/checks.py`: `check --deploy` zayıf `IP_HASH_SALT` için `bestory.W001` verir. Supabase: tüm tablolarda RLS açık/policy yok (Advisors'ta beklenen INFO "RLS Enabled No Policy"); projede Supabase'in `ensure_rls` event trigger'ı da var (yeni `public` tablolarında RLS'i otomatik açar); onun `rls_auto_enable()` fonksiyonunun anon/authenticated EXECUTE yetkisi `core/migrations/0002_revoke_rls_auto_enable.py` ile alınır.
+- **Test veritabanı güvenliği (Faz 4):** `manage.py test` her zaman SQLite kullanır (`TEST_ON_DATABASE_URL=1` ile kapatılır). Sebep: PowerShell'de `$env:DATABASE_URL=''` değişkeni siler, `.env` Supabase'i yükler; Faz 3 tarayıcı testleri ve bir Faz 4 test koşusu bu yüzden yanlışlıkla Supabase'e gitti. Açık SQLite seçimi: `DATABASE_URL=sqlite:///db.sqlite3` (settings'te postgres seçenekleri yalnızca postgres URL'ine uygulanır).
 
 ---
 

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Sayfa bulunamadı — Bestory{% endblock %}
+{% block robots %}noindex{% endblock %}
+
+{% block content %}
+<section class="error-page container">
+  <p class="error-page__code" aria-hidden="true">404</p>
+  <h1>Bu sayfayı bulamadık</h1>
+  <p>Aradığın sayfa taşınmış ya da hiç var olmamış olabilir. Ürün aramaya ana sayfadan devam edebilirsin.</p>
+  <a class="btn btn-primary" href="/">Ana sayfaya dön</a>
+</section>
+{% endblock %}

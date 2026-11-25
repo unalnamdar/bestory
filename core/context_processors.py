@@ -10,4 +10,6 @@ def site(request):
         "default_country": detect_country(request, request.GET.get("country")),
         # Where "Giriş yap" should send the user back to (not from the account pages themselves).
         "login_next": "" if path.startswith("/hesap/") else path,
+        # Path only: query strings (searches) are not separate pages.
+        "canonical_url": request.build_absolute_uri(request.path),
     }

@@ -91,7 +91,16 @@ TEMPLATES = [
 # DATABASE_URL is empty (handy for fast local tests).
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
-if DATABASE_URL:
+# `manage.py test` always uses a throwaway SQLite database, so a test run can never
+# create a test_* database on Supabase (set TEST_ON_DATABASE_URL=1 to opt out).
+if "test" in sys.argv and not env_bool("TEST_ON_DATABASE_URL", False):
+    DATABASE_URL = ""
+if DATABASE_URL.startswith("sqlite:"):
+    # Explicit local SQLite, e.g. DATABASE_URL=sqlite:///db.sqlite3. Use this (not an
+    # empty value) to force SQLite from PowerShell: `$env:X=''` deletes the variable,
+    # and then .env would quietly connect to Supabase.
+    DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
+elif DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.parse(DATABASE_URL, conn_max_age=0, ssl_require=not DEBUG)
     }
@@ -178,6 +187,12 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_HSTS_SECONDS = 3600  # raise gradually once production is verified
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    # Vercel serves every host over HTTPS only, so a long HSTS is safe. Lower it
+    # through the env var before moving to a custom domain you are unsure about.
+    SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", "31536000"))  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = False
+    SESSION_COOKIE_HTTPONLY = True
+    # Preload can only be requested for a registrable domain; *.vercel.app is
+    # already on the browsers' HSTS preload list as a whole.
+    SILENCED_SYSTEM_CHECKS = ["security.W021"]

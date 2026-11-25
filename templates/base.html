@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Bestory{% endblock %}</title>
   <meta name="description" content="{% block description %}Almak istediğin ürün kategorisini ülkene göre analiz et: en çok satanlar, en yüksek puanlılar ve fiyat/performans.{% endblock %}">
+  <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
+  {% if canonical_url %}<link rel="canonical" href="{{ canonical_url }}">{% endif %}
+  <meta property="og:site_name" content="Bestory">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="tr_TR">
+  <meta property="og:title" content="{% block og_title %}Bestory — Ne almak istiyorsun?{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}Ürün kategorini yaz, ülkeni seç: en çok satanlar, en yüksek puanlılar ve fiyat/performans listesi kaynak linkleriyle.{% endblock %}">
+  {% if canonical_url %}<meta property="og:url" content="{{ canonical_url }}">{% endif %}
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#F5F6F8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111418" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
   {% include "partials/theme_script.html" %}
   <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
 {% block title %}Profil — Bestory{% endblock %}
+{% block robots %}noindex{% endblock %}
 
 {% block content %}
 <section class="auth container">
-  <div class="auth-card">
+  <div class="auth-card auth-card--wide">
     <h1>Profil</h1>
     <dl class="profile-list">
       <div><dt>Kullanıcı adı</dt><dd>{{ user.username }}</dd></div>
@@ -15,7 +16,23 @@
       </div>
       <div><dt>Katılma tarihi</dt><dd>{{ user.date_joined|date:"j F Y" }}</dd></div>
     </dl>
-    <p class="note">Son aramaların burada listelenecek.</p>
+
+    <h2 class="profile-h2">Son aramaların</h2>
+    {% if recent %}
+      <ol class="history">
+        {% for item in recent %}
+          <li class="history__item">
+            <a class="history__link" href="{{ item.url }}">{{ item.query }}</a>
+            <span class="history__meta">{{ item.country_name }} · {{ item.mode_label }} · <time datetime="{{ item.created_at|date:'c' }}">{{ item.created_at|date:"j M Y H:i" }}</time></span>
+            {% if item.custom_criteria %}<span class="history__custom">“{{ item.custom_criteria|truncatechars:80 }}”</span>{% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+      <p class="note">Son 24 saatteki aramalar önbellekten anında açılır ve arama hakkından düşmez; daha eskiler yeniden analiz edilir.</p>
+    {% else %}
+      <p class="note">Henüz arama yapmadın. <a href="/">İlk aramanı yap</a>.</p>
+    {% endif %}
+
     <form method="post" action="{% url 'accounts:logout' %}">
       {% csrf_token %}
       <button class="btn btn-secondary" type="submit">Çıkış yap</button>

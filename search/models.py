@@ -44,6 +44,10 @@ class SearchLog(models.Model):
     query = models.CharField(max_length=200, blank=True)
     country = models.CharField(max_length=2, blank=True)
     mode = models.CharField(max_length=20, blank=True)
+    # Filters + custom text as the user sent them, so a member can reopen the same
+    # search (same cache key) from the profile page. Nullable so the previous deploy
+    # keeps inserting rows between `migrate` and the new deploy.
+    params = models.JSONField(default=dict, blank=True, null=True)
     cache_hit = models.BooleanField(default=False)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES)
     duration_ms = models.IntegerField(default=0)

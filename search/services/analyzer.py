@@ -198,6 +198,7 @@ def run_search(request, req, country):
             query=req.query[:200],
             country=country,
             mode=req.mode,
+            params={"filters": req.filters.model_dump(), "custom_criteria": req.custom_criteria},
             cache_hit=cache_hit,
             status=status,
             duration_ms=int((time.monotonic() - started) * 1000),

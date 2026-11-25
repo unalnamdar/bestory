@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% comment %}
+  Rendered by Django's server_error view with an EMPTY context (no request, no
+  context processors, no user). Keep it free of anything that needs them.
+{% endcomment %}
+
+{% block title %}Bir hata oluştu — Bestory{% endblock %}
+{% block robots %}noindex{% endblock %}
+
+{% block content %}
+<section class="error-page container">
+  <p class="error-page__code" aria-hidden="true">500</p>
+  <h1>Bir şeyler ters gitti</h1>
+  <p>Sunucuda beklenmeyen bir hata oluştu. Birkaç saniye sonra tekrar dene; sorun sürerse daha sonra uğra.</p>
+  <a class="btn btn-primary" href="/">Ana sayfaya dön</a>
+</section>
+{% endblock %}
