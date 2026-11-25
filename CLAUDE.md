@@ -482,7 +482,7 @@ Gizli değerler asla koda veya repoya yazılmaz. `.env` `.gitignore`'da olmalı.
 | 0 | Kurulum, iskelet, Supabase + Vercel bağlantısı | ✅ (canlı: https://bestory.vercel.app) |
 | 1 | Arayüz, tasarım sistemi, dark mode (mock verilerle) | ✅ Kod hazır; kullanıcı gözle doğrulayacak |
 | 2 | Gerçek analiz motoru (LLM + web search, cache, rate limit) | 🟨 Kod + testler hazır (Anthropic, Gemini, Tavily+Gemini); canlı arama anahtar bekliyor |
-| 3 | Üyelik sistemi (kayıt, giriş, çıkış, profil) | 🟨 Kod + testler hazır, tarayıcıda denendi; Supabase `migrate` ve canlı deploy bekliyor |
+| 3 | Üyelik sistemi (kayıt, giriş, çıkış, profil) | ✅ Canlıda (Supabase `migrate` uygulandı, commit `d746cc0`); kullanıcı canlıda kayıt/giriş akışını gözle doğrulayacak |
 | 4 | Cilalama ve production yayını | ⬜ |
 
 ---
